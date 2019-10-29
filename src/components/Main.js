@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-import fetchPosts from '../logic/fetch'
+import Card from './Card'
+import Loading from './Loading'
+
+// import fetchPosts from '../logic/fetch'
 
 const Main = () => {
   const [posts, setPosts] = useState([])
@@ -11,7 +14,7 @@ const Main = () => {
   useEffect(() => {
     document.addEventListener('scroll', handleScrollLoading)
     fetchPosts(page)
-  }, [])
+  }, [page])
 
   const handleScrollLoading = page => {
     let distance = Math.round(
@@ -19,7 +22,7 @@ const Main = () => {
     )
 
     if (distance <= 2) {
-      setPage(page + 1)
+      updatePosts(page)
     }
   }
 
@@ -27,9 +30,6 @@ const Main = () => {
     axios
       .get(`https://api.hackerwebapp.com/news?page=${page}`)
       .then(response => {
-        response.data.forEach(element => {
-          console.log(element)
-        })
         setPosts(response.data)
         toggleIsLoaded(true)
       })
@@ -38,11 +38,38 @@ const Main = () => {
       })
   }
 
+  const updatePosts = () => {
+    let currentPosts = posts
+    let scrollPos = window.scrollY
+
+    console.log('fired')
+
+    if (page < 11) {
+      console.log('should be loading now', page)
+      axios
+        .get(`https://api.hackerwebapp.com/news?page=${page}`)
+        .then(response => {
+          setPosts(currentPosts.concat(response.data))
+        })
+        .catch(err => {
+          console.log('ERROR:', err)
+        })
+    }
+
+    window.scrollTo(0, scrollPos)
+  }
+
   return (
     <div>
-      {posts.map((item, index) => {
-        return <div>{item.title}</div>
-      })}
+      {!isLoaded ? (
+        <Loading />
+      ) : (
+        <div>
+          {posts.map((post, index) => {
+            return <Card key={index} story={post} />
+          })}
+        </div>
+      )}
     </div>
   )
 }
