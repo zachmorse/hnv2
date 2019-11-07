@@ -5,10 +5,12 @@
   "dependencies": {
     "axios": "^0.19.0",
     "compromise": "^11.14.2",
+    "framer-motion": "^1.6.15",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-modal": "^3.9.1",
     "react-scripts": "3.0.1",
+    "react-spinners": "^0.6.1",
     "styled-components": "^4.4.0"
   },
   "scripts": {

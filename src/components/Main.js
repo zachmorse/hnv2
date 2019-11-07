@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react'
+import styled from 'styled-components'
+import PropagateLoader from 'react-spinners/PropagateLoader'
 import axios from 'axios'
 
 import Card from './Card'
 import Loading from './Loading'
+import BottomControls from './BottomControls'
 
 // import fetchPosts from '../logic/fetch'
+
+const MainContainer = styled.div`
+  margin-bottom: 75px;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const LoadingContainer = styled.div`
+  height: 100vh;
+  display: flex;
+  align-items: center;
+`
 
 const Main = () => {
   const [posts, setPosts] = useState([])
@@ -12,23 +29,14 @@ const Main = () => {
   const [isLoaded, toggleIsLoaded] = useState(false)
 
   useEffect(() => {
-    document.addEventListener('scroll', handleScrollLoading)
     fetchPosts(page)
   }, [page])
 
-  const handleScrollLoading = page => {
-    let distance = Math.round(
-      ((document.body.scrollHeight - window.innerHeight - window.scrollY + 35) / document.body.scrollHeight) * 100
-    )
-
-    if (distance <= 2) {
-      updatePosts(page)
-    }
-  }
-
-  const fetchPosts = page => {
+  const fetchPosts = pageNum => {
+    toggleIsLoaded(false)
+    console.log(page, pageNum)
     axios
-      .get(`https://api.hackerwebapp.com/news?page=${page}`)
+      .get(`https://api.hackerwebapp.com/news?page=${pageNum}`)
       .then(response => {
         setPosts(response.data)
         toggleIsLoaded(true)
@@ -38,39 +46,33 @@ const Main = () => {
       })
   }
 
-  const updatePosts = () => {
-    let currentPosts = posts
-    let scrollPos = window.scrollY
-
-    console.log('fired')
-
-    if (page < 11) {
-      console.log('should be loading now', page)
-      axios
-        .get(`https://api.hackerwebapp.com/news?page=${page}`)
-        .then(response => {
-          setPosts(currentPosts.concat(response.data))
-        })
-        .catch(err => {
-          console.log('ERROR:', err)
-        })
+  const updatePosts = direction => {
+    if (direction === 'fwd' && page <= 9) {
+      setPage(page + 1)
+      fetchPosts(page)
     }
 
-    window.scrollTo(0, scrollPos)
+    if (direction === 'rev' && page >= 2) {
+      setPage(page - 1)
+      fetchPosts(page)
+    }
   }
 
   return (
-    <div>
+    <MainContainer>
       {!isLoaded ? (
-        <Loading />
+        <LoadingContainer>
+          <PropagateLoader size={15} />
+        </LoadingContainer>
       ) : (
         <div>
           {posts.map((post, index) => {
             return <Card key={index} story={post} />
           })}
+          <BottomControls updatePosts={updatePosts} />
         </div>
       )}
-    </div>
+    </MainContainer>
   )
 }
 
