@@ -1,32 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
-import PropagateLoader from 'react-spinners/PropagateLoader'
+// import styled from 'styled-components'
+// import PropagateLoader from 'react-spinners/PropagateLoader'
 import axios from 'axios'
 
 import Card from './Card'
 import Loading from './Loading'
 import BottomControls from './BottomControls'
-
-// import fetchPosts from '../logic/fetch'
-
-const MainContainer = styled.div`
-  margin-bottom: 75px;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
-
-const LoadingContainer = styled.div`
-  height: 100vh;
-  display: flex;
-  align-items: center;
-`
+import { MainContainer } from './styled'
 
 const Main = () => {
   const [posts, setPosts] = useState([])
   const [page, setPage] = useState(1)
   const [isLoaded, toggleIsLoaded] = useState(false)
+  const [storyTypeMenuOpen, toggleStoryTypeMenuOpen] = useState(false)
 
   useEffect(() => {
     fetchPosts(page)
@@ -34,7 +20,6 @@ const Main = () => {
 
   const fetchPosts = pageNum => {
     toggleIsLoaded(false)
-    console.log(page, pageNum)
     axios
       .get(`https://api.hackerwebapp.com/news?page=${pageNum}`)
       .then(response => {
@@ -58,18 +43,25 @@ const Main = () => {
     }
   }
 
+  const toggleStoryMenu = () => {
+    console.log(storyTypeMenuOpen)
+    toggleStoryTypeMenuOpen(!storyTypeMenuOpen)
+  }
+
   return (
     <MainContainer>
       {!isLoaded ? (
-        <LoadingContainer>
-          <PropagateLoader size={15} />
-        </LoadingContainer>
+        <Loading />
       ) : (
         <div>
           {posts.map((post, index) => {
             return <Card key={index} story={post} />
           })}
-          <BottomControls updatePosts={updatePosts} />
+          <BottomControls
+            updatePosts={updatePosts}
+            storyTypeMenuOpen={storyTypeMenuOpen}
+            toggleStoryMenu={toggleStoryMenu}
+          />
         </div>
       )}
     </MainContainer>

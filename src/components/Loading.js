@@ -1,14 +1,6 @@
 import React from 'react'
-import styled from 'styled-components'
 import PropagateLoader from 'react-spinners/PropagateLoader'
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-`
+import { LoadingContainer } from './styled'
 
 function Loading() {
   return (
